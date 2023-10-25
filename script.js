@@ -1,8 +1,9 @@
 let lastTarget;
-let m;
-let y;
+let nav = 0;
 let clicked = null;
 let events = localStorage.getItem('events') ? JSON.parse(localStorage.getItem('events')) : [];
+
+
 
 const dias = ['lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado', 'domingo'];
 const upperDias = {
@@ -14,27 +15,54 @@ const upperDias = {
     sábado: "Sábado",
     domingo: "Domingo"
 }
-const meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+const upperMeses = {
+    enero: 'Enero',
+    febrero: 'Febrero',
+    marzo: 'Marzo',
+    abril: 'Abril',
+    mayo: 'Mayo',
+    junio: 'Junio',
+    julio: 'Julio',
+    agosto: 'Agosto',
+    septiembre: 'Septiembre',
+    octubre: 'Octubre',
+    noviembre: 'Noviembre',
+    diciembre: 'Diciembre'
+};
 const calendar = document.querySelector('.calendar');
 const mes_text = document.querySelector('#header_month');
 const año_text = document.querySelector('#header_year');
 
-load(new Date());
+load();
 
-function load(date) {
-    const day = date.getDate();
-    m = date.getMonth();
-    y = date.getFullYear();
-    mes_text.innerText = meses[m];
-    año_text.innerText = y;
+function load() {
+    const dt = new Date();
+    if (nav !== 0) {
+        dt.setMonth(new Date().getMonth() + nav);
+    }
+    const day = dt.getDate();
+    const dtStr = dt.toLocaleString('es-ES',
+        {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        }).split(',');
 
-    let auxDate = new Date(y, m + 1, 0);
+    const month = dt.getMonth();
+    const year = dt.getFullYear();
+    mes_text.innerText = upperMeses[dt.toLocaleString('es-ES', { month: 'long' })];
+    año_text.innerText = year;
+    document.querySelector('.info .date h1').innerText = upperDias[dtStr[0]];
+    document.querySelector('.info .date p').innerText = dtStr[1];
+
+    let auxDate = new Date(year, month + 1, 0);
 
     let max = auxDate.getDate();
-    let first = firstDay(y, m).split(',')[0];
+    let first = firstDay(year, month).split(',')[0];
 
     let padding = dias.indexOf(first);
-
+    calendar.querySelector('.main').innerHTML = '';
     for (let i = 0; i < padding; i++) {
         let empty = document.createElement('div');
         empty.classList.add('tarjeta_dia');
@@ -49,8 +77,12 @@ function load(date) {
         if (i === day)
             fill.classList.add('today')
         fill.innerText = i;
+        fill.setAttribute("y", year);
+        fill.setAttribute("m", month);
+        fill.setAttribute("d", i);
         fill.append(barrita);
-        fill.setAttribute("clicked", "false");
+        fill.toggleAttribute("clicked", false);
+        fill.addEventListener('click', dayClicked);
         calendar.querySelector('.main').append(fill);
     }
 
@@ -73,41 +105,31 @@ function load(date) {
 
 
 document.querySelector('.calendar_header').addEventListener('click', (e) => {
-    calendar.querySelector('.main').innerHTML = '';
-    if (e.target.id === 'next_month') {
-        m++;
-        if (m > 11) {
-            m = 0;
-            y++;
-        }
-    } else if (e.target.id === 'prev_month') {
-        m--;
-        if (m < 0) {
-            m = 11;
-            y--;
-        }
-    }
-    load(new Date(y, m));
+    if (e.target.id === 'next_month')
+        nav++;
+    else if (e.target.id === 'prev_month')
+        nav--;
+    load();
 })
 
-
-document.querySelector('.calendar .main').addEventListener('click', (e) => {
-
-    if (lastTarget) {
-        let lastTargetAttribute = lastTarget.getAttribute("clicked");
-        lastTarget.setAttribute("clicked", lastTargetAttribute == "true" ? "false" : "true");
+function dayClicked(e) {
+    if (lastTarget && lastTarget !== e.target) {
+        lastTarget.toggleAttribute("clicked", false);
+        e.target.toggleAttribute("clicked", true);
+    } else if (lastTarget && lastTarget === e.target) {
+        e.target.toggleAttribute("clicked", false);
+    } else {
+        e.target.toggleAttribute("clicked", true);
     }
     lastTarget = e.target;
     clicked = e.target;
-    let attr_value = e.target.getAttribute("clicked");
-    e.target.setAttribute("clicked", attr_value == "true" ? "false" : "true");
 
-    cambiarInfoDerecha();
-})
+    cambiarInfoDerecha(e.target);
+}
 
-function cambiarInfoDerecha() {
-    let dt = new Date(y, m, clicked.innerText);
-    
+function cambiarInfoDerecha(target) {
+    let dt = new Date(target.getAttribute('y'), target.getAttribute('m'), target.getAttribute('d'));
+
     let dia = dt.toLocaleString('es-ES', {
         weekday: 'long',
         year: 'numeric',
@@ -119,9 +141,6 @@ function cambiarInfoDerecha() {
     document.querySelector('.info .date h1').innerText = upperDias[dia[0]];
     document.querySelector('.info .date p').innerText = `${dia[1]}`;
 }
-
-
-
 
 function firstDay(year, month) {
     return new Date(year, month, 1).toLocaleString('es-ES', {
