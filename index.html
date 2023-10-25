@@ -32,7 +32,7 @@
             justify-content: center;
             font-size: 70%;
             background-color: rgb(253, 255, 252);
-            height: min(8vh, 5vw);
+            height: min(7vh, 4vw);
             cursor: pointer;
             position: relative;
         }
@@ -88,8 +88,8 @@
 </head>
 
 <body class="bg-slate-950 h-screen p-2 box-border">
-    <div class="parent xxl:container h-100 w-[80%] mx-auto grid grid-cols-2 grid-rows-1 p-1">
-        <div class="calendar rounded p-6 text-center bg-slate-50 flex flex-col gap-1 text-slate-600">
+    <div class="parent container h-100 mx-auto grid grid-cols-2 grid-rows-1 p-1">
+        <div class="calendar h-90 rounded p-6 text-center bg-slate-50 flex flex-col gap-1 text-slate-600">
             <div class="calendar_header flex items-center justify-between px-2 py-6">
                 <div class="left flex items-center">
                     <span id="prev_month" class="material-symbols-outlined">
@@ -117,17 +117,17 @@
             </div>
             <div class="main grid grid-cols-7"></div>
         </div>
-        <div class="info relative p-2 text-center grid grid-flow-row auto-rows-max gap-5">
-            <div class="date flex md:flex-row md:items-center md:justify-between
+        <div class="info relative p-4 text-center grid grid-flow-row auto-rows-max gap-5">
+            <div class="date flex md:flex-row md:items-center place-content-start md:gap-20
              flex-col p-2">
                 <div class="day">
                     <h1 class="text-white md:text-3xl sm:text-base"></h1>
                 </div>
                 <div class="rest">
-                    <p class="text-gray-600 md:text-md text-xs"></p>
+                    <p class="text-stone-400 lg:text-lg md:text-base text-xs"></p>
                 </div>
             </div>
-            <div class="events_parent h-40 max-h-[100%] overflow-auto">
+            <div class="events_parent h-[50%] overflow-auto">
                 <div class="event flex flex-col items-start justify-center gap-1 py-1 pl-5">
                     <div class="flex items-center gap-2">
                         <span
